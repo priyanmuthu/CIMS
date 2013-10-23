@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.prefs.Preferences;
 
 /**
  *
@@ -21,14 +20,9 @@ public class Chemical {
     String molecularFormula;
     int rack;
     String storageType;
-    static Preferences pref;
-    static String uname;
-    static String pass;
     
     Chemical(){
-        pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-        uname = CIMS_Preference.getUname();
-        pass = CIMS_Preference.getPass();
+        
     }
     Chemical(String cas,String IUPACName, String commonName,String molecularFormula,int rack, String storageType){
         this.cas = cas;
@@ -37,9 +31,6 @@ public class Chemical {
         this.molecularFormula = molecularFormula;
         this.rack = rack;
         this.storageType = storageType;
-        pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-        uname = CIMS_Preference.getUname();
-        pass = CIMS_Preference.getPass();
     }
     /*
      * This function will search the Database by the entered Cas No.
@@ -48,11 +39,8 @@ public class Chemical {
      */
     static Chemical serachChemCas(String cas){
         try{
-            pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-            uname = CIMS_Preference.getUname();
-            pass = CIMS_Preference.getPass();
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cims",uname,pass);
+            Connection con = DriverManager.getConnection("jdbc:odbc:CIMSDatabase","root","root");
             Statement smt = con.createStatement();
             ResultSet rs = smt.executeQuery("select * from "+Constant.chemical_table+" where casno = '"+cas+"';");
             rs.next();
@@ -75,11 +63,8 @@ public class Chemical {
      */
     static Chemical searchChemCommonName(String commonName){
         try{
-            pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-            uname = CIMS_Preference.getUname();
-            pass = CIMS_Preference.getPass();
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cims",uname,pass);
+            Connection con = DriverManager.getConnection("jdbc:odbc:CIMSDatabase","root","root");
             Statement smt = con.createStatement();
             ResultSet rs = smt.executeQuery("select * from "+Constant.chemical_table+" where cname = '"+commonName+"';");
             rs.next();
@@ -102,11 +87,8 @@ public class Chemical {
      */
     static Chemical searchChemMolecularFormula(String molecularFormula){
         try{
-            pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-            uname = CIMS_Preference.getUname();
-            pass = CIMS_Preference.getPass();
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cims",uname,pass);
+            Connection con = DriverManager.getConnection("jdbc:odbc:CIMSDatabase","root","root");
             Statement smt = con.createStatement();
             ResultSet rs = smt.executeQuery("select * from "+Constant.chemical_table+" where mfor = '"+molecularFormula+"';");
             rs.next();
@@ -129,11 +111,8 @@ public class Chemical {
      */
     static Chemical searchIUPACName(String IUPACName){
         try{
-            pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-            uname = CIMS_Preference.getUname();
-            pass = CIMS_Preference.getPass();
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cims",uname,pass);
+            Connection con = DriverManager.getConnection("jdbc:odbc:CIMSDatabase","root","root");
             Statement smt = con.createStatement();
             ResultSet rs = smt.executeQuery("select * from "+Constant.chemical_table+" where iname = '"+IUPACName+"';");
             rs.next();
@@ -162,19 +141,11 @@ public class Chemical {
     static boolean addNewChem(String cas,String IUPACName, String commonName,String molecularFormula,int rack, String storageType){
         
         try{
-            pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-            uname = CIMS_Preference.getUname();
-            pass = CIMS_Preference.getPass();
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cims",uname,pass);
+            Connection con = DriverManager.getConnection("jdbc:odbc:CIMSDatabase","root","root");
             Statement smt = con.createStatement();
-            if(cas.length()>0 && IUPACName.length()>0 && molecularFormula.length()>0){
-                smt.executeUpdate("insert into "+Constant.chemical_table+" values ('"+cas+"','"+IUPACName+"',"+rack+",'"+commonName+"','"+molecularFormula+"','"+storageType+"');");
-                return true;
-            }
-            else{
-                return false;
-            }
+            smt.executeUpdate("insert into "+Constant.chemical_table+" values ('"+cas+"','"+IUPACName+"',"+rack+",'"+commonName+"','"+molecularFormula+"','"+storageType+"');");
+            return true;
         }catch(Exception e){
             System.out.println(e);
         }
@@ -192,19 +163,11 @@ public class Chemical {
      */
     static boolean editChem(String cas,String IUPACName, String commonName,String molecularFormula,int rack, String storageType){
         try{
-            pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-            uname = CIMS_Preference.getUname();
-            pass = CIMS_Preference.getPass();
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cims",uname,pass);
+            Connection con = DriverManager.getConnection("jdbc:odbc:CIMSDatabase","root","root");
             Statement smt = con.createStatement();
-            if(cas.length()>0 && IUPACName.length()>0 && molecularFormula.length()>0){
-                smt.executeUpdate("update "+ Constant.chemical_table+" set iname = '"+IUPACName+"', cname = '"+commonName+"', mfor = '"+molecularFormula+"',rno = "+rack+", stype = '"+storageType+"' where casno = '"+cas+"';");
-                return true;
-            }else{
-                return false;
-            }
-            
+            smt.executeUpdate("update "+ Constant.chemical_table+" set iname = '"+IUPACName+"', cname = '"+commonName+"', mfor = '"+molecularFormula+"',rno = "+rack+", stype = '"+storageType+"' where casno = '"+cas+"';");
+            return true;
         }catch(Exception e){
             System.out.println(e);
         }
@@ -217,11 +180,8 @@ public class Chemical {
      */
     static boolean deleteChem(String cas){
         try{
-            pref = Preferences.userRoot().node(CIMS_Preference.getNode());
-            uname = CIMS_Preference.getUname();
-            pass = CIMS_Preference.getPass();
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cims",uname,pass);
+            Connection con = DriverManager.getConnection("jdbc:odbc:CIMSDatabase","root","root");
             Statement smt = con.createStatement();
             smt.executeUpdate("delete from "+ Constant.chemical_table+" where casno = '"+cas+"';");
             return true;
@@ -246,7 +206,7 @@ public class Chemical {
     static boolean checkCAS(String cas){
         try{
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cims",uname,pass);
+            Connection con = DriverManager.getConnection("jdbc:odbc:CIMSDatabase","root","root");
             Statement smt = con.createStatement();
             ResultSet rs = smt.executeQuery("select casno from "+Constant.chemical_table+";");
             while(rs.next()){
